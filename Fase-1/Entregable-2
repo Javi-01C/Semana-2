@@ -1,0 +1,51 @@
+            >  **Fórmula matemática del costo de n inserciones con incremento de +1**
+
+ Estrategia Actual: Incremento Lineal (+1)
+ Cada vez que se agrega un elemento, se crea un nuevo arreglo con capacidad `n + 1` y se copian todos los elementos anteriores.
+         --Fórmula de Costo --
+   El número total de operaciones de copia para insertar n elementos es la suma de los enteros desde 0 hasta n-1
+
+Costo(n) = \sum_{i=0}^{n-1} i = 0 + 1 + 2 + ... + (n-1)
+        
+       
+Forma Cerrada:
+Costo(n) = \frac{n(n-1)}{2} \approx \frac{n^2}{2}
+
+**Complejidad:**
+Total: O(n^2) (Cuadrática)
+Por inserción: O(n)
+
+Si n se duplica, el trabajo se cuadruplica. Para 1,000 elementos, hacemos ~500,000 copias.
+
+---
+
+   > **Fórmula del costo con duplicación de capacidad**
+El arreglo comienza pequeño y su capacidad se multiplica por 2 solo cuando está lleno.
+
+Las copias ocurren solo en potencias de 2 (1, 2, 4, 8, ...n). Esto forma una Serie Geométrica.
+Costo(n) = \sum_{k=0}^{\log_2 n} 2^k = 1 + 2 + 4 + ... + n
+
+**Forma Cerrada:
+Costo(n) = 2n - 1 \approx 2n$$
+
+Complejidad:
+Total: O(n) (Lineal)
+Por inserción (Amortizado): O(1)
+
+Para 1,000 elementos, hacemos solo ~2,000 copias (vs 500,000 del método anterior).
+
+---
+
+> ** Informe breve **
+
+El análisis forense del código ha revelado que la lentitud del sistema no se debe a falta de recursos de hardware,
+sino a una ineficiencia matemática en cómo almacenamos los datos en memoria.
+EL problema actualmente es que el sistema utiliza una estrategia de "mudanza constante".
+Imaginen que para archivar una nueva hoja de papel, sacamos todas las hojas anteriores del archivero,
+las copiamos a una carpeta nueva con espacio para *una sola hoja más*, y tiramos la carpeta vieja.
+Al llegar a miles de hojas, pasamos el 99% del tiempo moviendo papel inútilmente.
+Matemáticamente, el esfuerzo crece al cuadrado: cargar el doble de datos nos toma cuatro veces más tiempo.
+La solucion seria que implementaremos una estrategia de "Duplicación de Capacidad".
+Solo cambiaremos de carpeta cuando la actual esté llena, y la nueva tendrá el doble de espacio.
+Esto reduce las operaciones de copia de millones a unas pocas docenas.
+
