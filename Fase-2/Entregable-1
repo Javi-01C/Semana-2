@@ -1,0 +1,170 @@
+         ** CODIGO COMPLETO**
+#include <iostream>
+#include <stdexcept>
+
+class ArregloDinamico {
+private:
+    int* datos;      
+    int tamano;      
+    int capacidad;   
+
+    void redimensionar() {
+        this->capacidad *= 2;
+        int* nuevoArreglo = new int[this->capacidad]; 
+        
+        for (int i = 0; i < this->tamano; i++) {
+            nuevoArreglo[i] = this->datos[i];
+        }
+        
+        delete[] this->datos; 
+        this->datos = nuevoArreglo; 
+        
+        // Un print para que VEAS cuándo ocurre la magia
+        std::cout << "  [!] Redimensionando memoria... Nueva capacidad: " << this->capacidad << std::endl;
+    }
+
+public:
+    ArregloDinamico(int capacidadInicial) {
+        if (capacidadInicial <= 0) {
+            throw std::invalid_argument("La capacidad debe ser mayor a 0");
+        }
+        this->capacidad = capacidadInicial;
+        this->tamano = 0;
+        this->datos = new int[this->capacidad]; 
+    }
+
+    ~ArregloDinamico() {
+        delete[] this->datos; 
+    }
+
+    void agregar(int elemento) {
+        if (this->tamano == this->capacidad) {
+            redimensionar();
+        }
+        this->datos[this->tamano] = elemento;
+        this->tamano++;
+    }
+
+    void insertar(int indice, int elemento) {
+        if (indice < 0 || indice > this->tamano) {
+            throw std::out_of_range("Índice fuera de rango");
+        }
+        if (this->tamano == this->capacidad) {
+            redimensionar();
+        }
+        for (int i = this->tamano; i > indice; i--) {
+            this->datos[i] = this->datos[i - 1];
+        }
+        this->datos[indice] = elemento;
+        this->tamano++;
+    }
+
+    int eliminar(int indice) {
+        if (indice < 0 || indice >= this->tamano) {
+            throw std::out_of_range("Índice fuera de rango");
+        }
+        int elementoEliminado = this->datos[indice];
+        
+        for (int i = indice; i < this->tamano - 1; i++) {
+            this->datos[i] = this->datos[i + 1];
+        }
+        this->tamano--;
+        return elementoEliminado;
+    }
+
+    int obtener(int indice) {
+        if (indice < 0 || indice >= this->tamano) {
+            throw std::out_of_range("Índice fuera de rango");
+        }
+        return this->datos[indice];
+    }
+
+    int longitud() {
+        return this->tamano;
+    }
+};
+
+
+int main() {
+    try {
+        std::cout << "1. Creando arreglo con capacidad inicial de 2..." << std::endl;
+        ArregloDinamico miArreglo(2); 
+        
+        std::cout << "Agregando 10..." << std::endl;
+        miArreglo.agregar(10);
+        std::cout << "Agregando 20..." << std::endl;
+        miArreglo.agregar(20);
+        
+        std::cout << "Agregando 30... (Deberia forzar redimensionamiento a 4)" << std::endl;
+        miArreglo.agregar(30); 
+        
+        std::cout << "\n2. Mostrando contenido actual:" << std::endl;
+        for(int i = 0; i < miArreglo.longitud(); i++) {
+            std::cout << "   Indice [" << i << "] = " << miArreglo.obtener(i) << std::endl;
+        }
+        
+        std::cout << "\n3. Insertando el valor 15 en el indice 1..." << std::endl;
+        miArreglo.insertar(1, 15);
+        
+        for(int i = 0; i < miArreglo.longitud(); i++) {
+            std::cout << "   Indice [" << i << "] = " << miArreglo.obtener(i) << std::endl;
+        }
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Error crítico: " << e.what() << std::endl;
+    }
+    
+    return 0;
+}
+
+
+
+
+
+
+         ** TABLA DE COMPLEJIDAD**
+
+_______________________________________________________________________
+Método               |	Complejidad Temporal	  | Complejidad Espacial
+obtener(i)	         |$O(1)$	                  |$O(1)$
+agregar(v)	         |$O(1)$ Amortizado	        |$O(1)$
+insertar(i, v)	     |$O(n)$	                  |$O(1)$
+eliminar(i)	         |$O(n)$	                  |$O(1)$
+redimensionar()	     |$O(n)$	                  |$O(n)$
+Destructor	         |$O(1)$	                  |$O(1)$
+______________________________________________________________________
+
+
+
+
+
+                    ** CASOS BORDE**
+
+
+Durante la implementación, me di cuenta de que el código no solo debe funcionar cuando todo sale bien, 
+sino que debe protegerse de errores comunes o situaciones extremas para evitar que el programa explote. 
+
+       1: Capaciddad infinita
+
+ -Si alguien crea el arreglo con capacidad = 0, cuando se llene e intente redimensionarse, la fórmula de duplicación hará 0 * 2 = 0.
+ El arreglo nunca crecería y el programa colapsaría.
+     --Mi solución: En el constructor, puse una regla estricta. Si alguien intenta crear un arreglo con capacidad de 0 o números negativos, el código lanza un error (invalid_argument) y detiene la ejecución inmediatamente.
+
+
+       2:Fuera de Rango
+
+ -En C++, si tienes un arreglo de 5 elementos e intentas leer el índice [100] o el [-1], el lenguaje no te avisa,
+    simplemente va a esa parte de la memoria y te devuelve basura, lo cual es súper peligroso.
+         --Mi solución: Antes de hacer un obtener(), establecer(), eliminar() o insertar(), mi código verifica matemáticamente que el índice solicitado esté estrictamente
+           dentro del rango de los elementos que realmente existen (0 a tamano - 1). Si no es así, lanza una excepción.
+
+       3: Insertar usando el índice límite
+
+ -Normalmente, el método insertar(índice, valor) no te deja poner cosas fuera del rango actual. 
+  Pero, ¿qué pasa si el arreglo tiene 3 elementos (índices 0, 1, 2) y yo llamo a insertar(3, valor)?
+        --Mi solución: Diseñé la validación de insertar para que permita usar exactamente el índice igual a tamano.
+          En ese caso específico, el código es lo suficientemente inteligente para no mover nada y simplemente poner el valor al final,
+          comportándose exactamente igual que si hubieran llamado al método agregar().
+
+
+
