@@ -1,0 +1,103 @@
+    ---> PROBLEMA 1: <---
+Rotar Arreglo: Rotar un arreglo k posiciones a la derecha en O(1) de memoria extra.
+Intento 1: Al principio pensé: "Simplemente muevo todos los elementos una posición a la derecha, y repito eso k veces".
+   -Complejidad Temporal: O(n x k) porque por cada paso de k, recorro todo el arreglo n.
+   -Complejidad Espacial: O(1).
+         El problema: Si el arreglo tiene 100,000 elementos y k = 50,000, el programa tardaría muchísimo. 
+         El tiempo es cuadrático en el peor de los casos.
+Intento 2: La Solución Óptima (El truco de invertir)Investigando, aprendí un truco matemático genial: si inviertes el arreglo en partes,
+logras el resultado en tiempo lineal
+.Primero, reduzco k usando el módulo (k = k(mod n)) por si k es mayor que el tamaño del arreglo.
+Invierto TODO el arreglo. Invierto los primeros k elementos. Invierto los n-k elementos restantes.
+
+     SOLUCION FINAL:
+         función rotarArreglo(arreglo, k):
+                n = longitud(arreglo)
+                k = k MOD n
+
+                 invertir(arreglo, 0, n - 1)
+                 invertir(arreglo, 0, k - 1)
+                 invertir(arreglo, k, n - 1)
+
+             función invertir(arreglo, inicio, fin):
+              mientras inicio < fin:
+              intercambiar(arreglo[inicio], arreglo[fin])
+              inicio = inicio + 1
+              fin = fin - 1
+
+
+       *Complejidad Temporal: O(n) porque recorro el arreglo (o sus partes) un máximo de dos veces.
+       *Complejidad Espacial: O(1) porque solo uso variables temporales para los índices.
+
+
+       ---> PROBLEMA 2: <---
+    El problema: Eliminar duplicados in-place y retornar la nueva longitud.
+     Usar la técnica de "Dos Punteros". Como el arreglo ya está ordenado, los duplicados siempre estarán juntos. Un puntero lee y el otro escribe.
+       -Pseudocodigo:
+función eliminarDuplicados(arreglo):
+    si longitud(arreglo) == 0: retornar 0
+    
+    punteroLento = 0
+    
+    para punteroRapido desde 1 hasta longitud(arreglo) - 1:
+        si arreglo[punteroRapido] != arreglo[punteroLento]:
+            punteroLento = punteroLento + 1
+            arreglo[punteroLento] = arreglo[punteroRapido]
+            
+    retornar punteroLento + 1 // Nueva longitud
+
+      *Complejidad Temporal: O(n) porque el punteroRapido recorre el arreglo exactamente una vez.
+      *Complejidad Espacial: O(1) ya que modifico el arreglo original directamente.
+
+
+       ---> PROBLEMA 3: <---
+
+ Mover los ceros al final manteniendo el orden de los demás números.
+ Similar al anterior, uso dos punteros. Un puntero rastrea la posición donde debería ir el próximo número "diferente de cero".
+ Si encuentro un número válido, lo intercambio con la posición del cero
+     
+-Pseudocodigo:
+
+   función moverCeros(arreglo):
+    posicionLibre = 0
+    
+    para i desde 0 hasta longitud(arreglo) - 1:
+        si arreglo[i] != 0:
+            intercambiar(arreglo[posicionLibre], arreglo[i])
+            posicionLibre = posicionLibre + 1
+  
+   *Complejidad Temporal: O(n). Un solo ciclo para recorre el arreglo de inicio a fin.
+   *Complejidad Espacial: O(1). Modificación in-place, solo usando variables enteras para los índices.
+
+
+
+
+     ---> PROBLEMA 4: <---
+
+ Encontrar el número que aparece más de n/2 veces sin usar memoria extra.
+ Aquí no podía usar un "Diccionario" para contar porque violaría el O(1) de espacio. Utilicé el Algoritmo de Votación de Boyer-Moore.
+ Funciona como una batalla: un elemento distinto "mata" al candidato actual. Como el mayoritario es más de la mitad, al final sobrevivirá.
+
+ -Pseudocodigo:
+
+ función elementoMayoritario(arreglo):
+    candidato = nulo
+    votos = 0
+    
+    para cada numero en arreglo:
+        si votos == 0:
+            candidato = numero
+            votos = 1
+        sino si numero == candidato:
+            votos = votos + 1
+        sino:
+            votos = votos - 1
+            
+    retornar candidato
+
+   *Complejidad Temporal: O(n). Un único recorrido secuencial.
+   *Complejidad Espacial: O(1). Solo mantengo dos variables (candidato y votos), sin importar qué tan grande sea el arreglo.
+ 
+
+
+
