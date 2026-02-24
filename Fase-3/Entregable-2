@@ -1,0 +1,41 @@
+       ** TARJETAS DE REFERENCIA**
+
+--> Tarjeta 1: Dos Punteros:
+  Usar dos índices o punteros que recorren el arreglo al mismo tiempo. Pueden empezar juntos a diferentes velocidades (rápido/lento) o en extremos opuestos acercándose al centro,
+  logrando resolver el problema en una sola pasada (O(n)).
+   -Señales de Detección: El arreglo ya está ordenado, necesitas encontrar pares que cumplan una condición, o debes comparar elementos desde los extremos hacia el centro.
+     >Palabras Clave: Ordenado, Pares/Suma, Extremos.
+
+--> Tarjeta 2: Ventana Deslizante 
+  Mantener un "marco" sobre un subconjunto de elementos contiguos. Al avanzar, en lugar de recalcular todo, solo sumas el nuevo elemento que entra por la derecha y restas el que sale por la izquierda.
+  -Señales de Detección: Te piden el valor máximo, mínimo o la suma de una secuencia consecutiva dentro del arreglo.
+  -Palabras Clave (Keywords): Contiguo, Subarreglo, Tamaño K.
+
+--> Tarjeta 3: Modificación In-Place
+ Sobrescribir o intercambiar los valores dentro del mismo arreglo que te dieron como entrada, reciclando el espacio para no usar memoria adicional.
+  -Señales de Detección: El problema tiene una restricción estricta de complejidad espacial de O(1) o te prohíben explícitamente crear nuevas estructuras de datos.
+  -Palabras Clave (Keywords): O(1) espacio, Sobrescribir, Mismo arreglo.
+
+--> Tarjeta 4: Suma de Prefijo / Sufijo 
+ Pre-calcular un arreglo donde cada posición guarda la suma acumulada de todos los elementos anteriores. Esto permite responder consultas de rangos matemáticos en tiempo O(1).
+  -Señales de Detección: El problema requiere hacer muchas consultas repetitivas sobre sumar o multiplicar rangos específicos [i, j] dentro del arreglo.
+  -Palabras Clave (Keywords): Rango, Consultas múltiples, Acumulado.
+
+
+
+      **Aplicación de Patrones** 
+
+-Rotar Arreglo: 
+   * Patrón Usado: Modificación In-Place. Específicamente, aplicamos el sub-patrón de Inversión de Arreglos en tres pasos para mover los elementos sin crear un arreglo secundario, cumpliendo el requisito de O(1) de espacio.
+
+-Eliminar Duplicados (arreglo ordenado): 
+   * Patrón Usado: Dos Punteros (Puntero Rápido / Puntero Lento) + Modificación In-Place. El puntero rápido explora buscando números nuevos, y el lento marca dónde sobrescribir.
+
+-Mover Ceros al Final:
+   * Patrón Usado: Dos Punteros + Modificación In-Place. Un puntero lleva el control de la próxima posición libre para un número distinto de cero, y el otro avanza revisando cada elemento para hacer un swap.
+
+-Encontrar Elemento Mayoritario: 
+   * Patrón Usado: Aunque usa el algoritmo específico de Boyer-Moore, su esencia es una Modificación In-Place de Estado (In-Place tracking). 
+     Logramos llevar la cuenta en tiempo O(n) usando solo dos variables actualizables, sin caer en la trampa de usar un Hashmap que consumiría memoria O(n).
+
+
