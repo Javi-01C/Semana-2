@@ -1,0 +1,70 @@
+Bug 1: El devorador de memoria (Pérdida de datos)
+Bug Identificado: Al redimensionar el arreglo, el código crea un bloque de memoria nuevo y actualiza el puntero, pero olvida copiar los elementos del arreglo viejo al nuevo.
+
+Línea Específica: Entre nuevo_arreglo = nuevo Arreglo[capacidad] y datos = nuevo_arreglo.
+
+Corrección Propuesta: Añadir un bucle for para transferir los datos:
+
+    para i desde 0 hasta tamaño - 1:
+        nuevo_arreglo[i] = datos_viejos[i]
+
+Caso de Prueba Mínimo: 
+   1. Crear arreglo con capacidad 2.
+    2. agregar(10), agregar(20). (Arreglo lleno).
+     3. agregar(30). (Fuerza redimensionamiento).
+      4. obtener(0). Debería devolver 10, pero devolverá nulo o basura en memoria.
+
+
+
+Bug 2: El efecto dominó
+  Bug Identificado: En el método insertar, el bucle que desplaza los elementos hacia la derecha avanza de izquierda a derecha. 
+  Al hacer esto, el primer elemento desplazado sobrescribe al siguiente antes de que este pueda moverse, creando un efecto dominó que copia el mismo valor en todo el arreglo.
+
+Línea Específica: para i desde indice hasta tamaño - 1:
+
+Corrección Propuesta: El bucle debe ir en reversa (de derecha a izquierda):
+
+     para i desde tamaño - 1 bajando hasta indice:
+         datos[i + 1] = datos[i]
+
+Caso de Prueba Mínimo:
+ 1. Arreglo actual: [10, 20, 30].
+  2. Llamar a insertar(0, 99).
+   3. En lugar de obtener [99, 10, 20, 30], el arreglo terminará siendo [99, 10, 10, 10].
+
+
+Bug 3: El lector fantasma 
+Bug Identificado: En el método eliminar, el bucle desplaza elementos a la izquierda. Si el bucle llega hasta tamaño - 1 (el último índice real), la instrucción datos[i + 1] 
+intentará leer un índice que no existe (el índice equivalente a tamaño), provocando un error de lectura fuera de límites.
+
+Línea Específica: para i desde indice hasta tamaño - 1:
+
+Corrección Propuesta: El bucle debe detenerse un paso antes:
+
+       para i desde indice hasta tamaño - 2: // o estrictamente menor que tamaño - 1
+           
+ Caso de Prueba Mínimo:
+1. Arreglo actual de tamaño 3: [10, 20, 30] (índices 0, 1, 2).
+ 2. Llamar a eliminar(0).
+  3. Cuando i = 2, hará datos[2] = datos[3]. ¡El índice 3 es basura/inválido y el programa colapsará!
+
+
+
+Bug 4: La bomba de tiempo 
+Bug Identificado: El constructor no valida la capacidad_inicial. Si un usuario pasa 0 (o un número negativo), la capacidad será 0. 
+Cuando el arreglo intente redimensionarse, la fórmula 0 * 2 seguirá siendo 0, creando arreglos vacíos repetidamente y provocando un colapso en la memoria.
+
+Línea Específica: Faltan validaciones justo al inicio de metodo constructor(capacidad_inicial):
+
+Corrección Propuesta: Añadir una validación temprana (Guard Clause):
+
+     si capacidad_inicial <= 0:
+         lanzar Error("La capacidad debe ser mayor a 0")
+
+Caso de Prueba Mínimo:
+1. Llamar a miArreglo = nuevo ArregloDinamico(0).
+ 2. Llamar a agregar(10). (Esto detonará un redimensionamiento infinito o un error de asignación de memoria Arreglo[0]).
+
+
+
+
