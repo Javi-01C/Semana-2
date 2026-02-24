@@ -1,0 +1,81 @@
+
+---
+
+# 1. El Concepto: Arreglo Circular 
+
+Para evitar el costoso desplazamiento de elementos al eliminar el mensaje más viejo, utilizamos un "Arreglo Circular".
+Es un arreglo de tamaño estático donde el final se conecta lógicamente con el principio mediante un puntero (cabeza) que sobrescribe los datos antiguos.
+
+
+
+## Diagrama de Funcionamiento 
+
+
+1. Inicio (Vacío)      2. Llenando datos      3. Buffer Lleno        4. Sobrescribiendo (Evicción)
+Cabeza: 0              Cabeza: 3              Cabeza: 0 (Dio vuelta) Cabeza: 1
+
+  [ ]                     [A]                    [A] Vieja              [F] Nueva!
+ /   \                   /   \                  /   \                  /   \
+[ ]   [ ]  < Cabeza    [ ]   [B]              [E]   [B]              [E]   [B]
+ \   /                   \   /                  \   /                  \   /
+  [ ]-[ ]                 [ ]-[C]                [D]-[C]                [D]-[C]
+
+
+
+
+  clase MessageBuffer:
+    atributo buffer      // Arreglo estático
+    atributo capacidad   // Límite de mensajes (ej. 100)
+    atributo cabeza      // Índice de la próxima escritura
+    atributo tamaño      // Cantidad actual de mensajes
+
+    metodo constructor(limite):
+        capacidad = limite
+        buffer = nuevo Arreglo[capacidad]
+        cabeza = 0
+        tamaño = 0
+
+    metodo agregarMensaje(mensaje):
+        // 1. Sobrescribe el mensaje más viejo en la posición actual
+        buffer[cabeza] = mensaje
+        
+        // 2. Avanza circularmente usando el operador módulo (%)
+        cabeza = (cabeza + 1) % capacidad
+        
+        // 3. Mantiene el conteo hasta llegar al tope
+        si tamaño < capacidad:
+            tamaño = tamaño + 1
+
+    metodo obtenerMasReciente():
+        si tamaño == 0: retornar Nulo
+        // Calcula el índice anterior de forma segura
+        indice_reciente = (cabeza - 1 + capacidad) % capacidad
+        retornar buffer[indice_reciente]
+
+    metodo obtenerUltimosN(n):
+        si n > tamaño: n = tamaño
+        resultado = nuevo Arreglo[n]
+        
+        // Encuentra dónde empezar a leer hacia adelante
+        indice_lectura = (cabeza - n + capacidad) % capacidad
+        
+        para i desde 0 hasta n - 1:
+            resultado[i] = buffer[indice_lectura]
+            indice_lectura = (indice_lectura + 1) % capacidad
+            
+        retornar resultado
+
+
+
+
+
+
+Comparación: MessageBuffer vs ArrayList Tradicional
+Si hubiéramos usado un ArrayList estándar (como el de Java o Python) para este problema, el sistema habría colapsado bajo carga alta. ¿Por qué?
+El Problema del ArrayList (O(n) en eliminación): Al llegar a los 100 mensajes, para agregar el mensaje 101 tendríamos que eliminar el mensaje en el índice 0.
+Esto obliga al procesador a desplazar los 99 mensajes restantes un espacio hacia la izquierda para tapar el hueco.
+La Solución Circular (O(1) estricto): Nuestro MessageBuffer nunca desplaza elementos. Simplemente mueve el puntero cabeza al índice 0 y sobrescribe el dato viejo. 
+Hace cero copias de memoria por inserción, lo que lo hace infinitamente más escalable para un sistema de streaming o chat en tiempo real.
+
+
+        
